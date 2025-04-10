@@ -89,33 +89,41 @@ def group_by_conversation(emails):
 
 # exporter.py
 import os
+from datetime import datetime
 from config import EXPORT_PATH
-from utils import safe_filename  
+from utils import safe_filename
 
-#file_name = safe_filename(mail.Subject)
-#file_path = os.path.join(folder_name, f"{file_name}.txt")
 
 def export_email(mail, conversation_topic):
-    folder_name = f"{EXPORT_PATH}\\{conversation_topic.replace(' ','_')}"
-    os.makedirs(folder_name, exist_ok=True)
+    # Safe Folder Name
+    safe_folder_name = safe_filename(conversation_topic)
+    folder_path = os.path.join(EXPORT_PATH, safe_folder_name)
+    os.makedirs(folder_path, exist_ok=True)
 
-    file_path = f"{folder_name}\\{mail.Subject[:50].replace(' ','_')}.txt"
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+
+    safe_file_name = f"{safe_filename(mail.Subject)}_{timestamp}.txt"
+    file_path = os.path.join(folder_path, safe_file_name)
 
     with open(file_path, 'w', encoding='utf-8') as f:
         f.write(f"Subject: {mail.Subject}\n")
         f.write(f"From: {mail.SenderEmailAddress}\n")
+        f.write(f"To: {mail.To}\n")
         f.write(f"Date: {mail.ReceivedTime}\n\n")
         f.write(mail.Body)
 
+    # Export Attachments
     for att in mail.Attachments:
-        att.SaveAsFile(os.path.join(folder_name, att.FileName))
+        att.SaveAsFile(os.path.join(folder_path, att.FileName))
 
 
 def export_conversation(chain, conversation_topic):
-    folder_name = f"{EXPORT_PATH}\\{conversation_topic.replace(' ','_')}"
-    os.makedirs(folder_name, exist_ok=True)
+    safe_folder_name = safe_filename(conversation_topic)
+    folder_path = os.path.join(EXPORT_PATH, safe_folder_name)
+    os.makedirs(folder_path, exist_ok=True)
 
-    file_path = f"{folder_name}\\Conversation_{conversation_topic[:50].replace(' ','_')}.txt"
+    file_name = f"Conversation_{safe_filename(conversation_topic)}.txt"
+    file_path = os.path.join(folder_path, file_name)
 
     sorted_chain = sorted(chain, key=lambda x: x.ReceivedTime)
 
@@ -132,7 +140,9 @@ def export_conversation(chain, conversation_topic):
             f.write("\n\n")
 
             for att in mail.Attachments:
-                att.SaveAsFile(os.path.join(folder_name, att.FileName))
+                att.SaveAsFile(os.path.join(folder_path, att.FileName))
+
+
 
 # utils
 import re
