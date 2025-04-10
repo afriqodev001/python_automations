@@ -1,5 +1,7 @@
 # Streamlit Outlook Email Explorer - Project Structure
 
+sender = f"{mail.SenderName} <{mail.SenderEmailAddress}>" if mail.SenderEmailAddress else mail.SenderName
+
 # main.py
 import streamlit as st
 from email_client import OutlookClient
