@@ -90,7 +90,10 @@ def group_by_conversation(emails):
 # exporter.py
 import os
 from config import EXPORT_PATH
+from utils import safe_filename  
 
+#file_name = safe_filename(mail.Subject)
+#file_path = os.path.join(folder_name, f"{file_name}.txt")
 
 def export_email(mail, conversation_topic):
     folder_name = f"{EXPORT_PATH}\\{conversation_topic.replace(' ','_')}"
@@ -130,6 +133,19 @@ def export_conversation(chain, conversation_topic):
 
             for att in mail.Attachments:
                 att.SaveAsFile(os.path.join(folder_name, att.FileName))
+
+# utils
+import re
+
+def safe_filename(name, max_length=100):
+    # Remove invalid characters
+    name = re.sub(r'[\\/*?:"<>|]', "", name)
+
+    # Trim length if too long
+    if len(name) > max_length:
+        name = name[:max_length]
+
+    return name.strip()
 
 
 # requirements.txt
