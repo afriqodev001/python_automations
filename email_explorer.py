@@ -40,7 +40,18 @@ if keyword:
 
 
 # config.py
-EXPORT_PATH = r"C:\\EmailExports"
+import os
+
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))  # The directory where config.py is located
+
+EXPORT_PATH = os.path.join(BASE_DIR, 'EmailExports')
+
+# New & Modern way
+# from pathlib import Path
+
+# BASE_DIR = Path(__file__).resolve().parent
+# EXPORT_PATH = BASE_DIR / 'EmailExports'
+
 
 
 # logger.py
